@@ -6,7 +6,7 @@ from torchvision import transforms
 import os.path
 
 
-@runway.setup(options={'checkpoint': runway.file(extension='.pkl',description='checkpoint file')})
+@runway.setup(options={'checkpoint_dir': runway.directory(description="runs folder"), 'checkpoint_dir2': runway.directory(description="pretrained weights") ,})
 def setup(opts):
     path = Path(".")
     learn=load_learner(path, opts['checkpoint'])
