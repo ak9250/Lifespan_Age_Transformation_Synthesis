@@ -8,3 +8,5 @@ unidecode
 requests
 tqdm
 runway-python
+torch 
+torchvision
