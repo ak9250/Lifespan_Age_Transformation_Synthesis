@@ -5,5 +5,4 @@ spec:
   gpu: True
   cpu: False
 build_steps:
-  - conda install -c conda-forge dlib
   - pip install -r requirements.txt
