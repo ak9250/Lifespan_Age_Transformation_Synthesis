@@ -20,6 +20,8 @@ def translate(learn, inputs):
     p,img_hr,b = learn.predict(img_fast)
     return np.uint8(np.clip(image2np(img_hr), 0, 1)*255)
 
+    
+
 
 if __name__ == '__main__':
     runway.run(port=8889)
