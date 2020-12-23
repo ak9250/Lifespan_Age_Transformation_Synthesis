@@ -10,3 +10,4 @@ tqdm
 runway-python
 torch 
 torchvision
+dlib
