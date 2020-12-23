@@ -11,6 +11,8 @@ from data.data_loader import CreateDataLoader
 from models.models import create_model
 import util.util as util
 from util.visualizer import Visualizer
+import util.preprocess_itw_im as preprocess
+import util.deeplab as deepl
 
 opt = TestOptions().parse(save=False)
 opt.display_id = 0 # do not launch visdom
@@ -25,14 +27,16 @@ opt.interp_step = 0.05 # this controls the number of images to interpolate betwe
 
 
 
-
-
 @runway.setup(options={'checkpoint_dir': runway.directory(description="runs folder"), 'checkpoint_dir2': runway.directory(description="pretrained weights") ,'checkpoint_dir3': runway.file(extension='.dat',description="shape predictor") })
 def setup(opts):
     data_loader = CreateDataLoader(opt)
     dataset = data_loader.load_data()
     visualizer = Visualizer(opt)
-
+    preprocess.resnet_file_path = opts['checkpoint_dir2'] + r'/R-101-GN-WS.pth.tar' 
+    preprocess.deeplab_file_path = opts['checkpoint_dir2'] + r'/deeplab_model.pth'
+    preprocess.predictor_file_path = opts['checkpoint_dir3'] 
+    preprocess.model_fname = opts['checkpoint_dir2'] + r'/deeplab_model.pth'
+    deepl.resnet101(opts['checkpoint_dir2'] + r'/R-101-GN-WS.pth.tar')
     opt.name = opts['checkpoint_dir']
     model = create_model(opt)
     return model
@@ -45,8 +49,7 @@ def translate(model, inputs):
 
     # os.makedirs('results', exist_ok=True)
     # out_path = os.path.join('results', os.path.splitext(img_path)[0].replace(' ', '_') + '.mp4')
-    visualizer.make_video(visuals, out_path)
-    return np.uint8(np.clip(image2np(img_hr), 0, 1)*255)
+    return visualizer.make_video(visuals, out_path)
 
 
 
