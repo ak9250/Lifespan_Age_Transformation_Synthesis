@@ -222,7 +222,7 @@ def resnet50(pretrained=False, **kwargs):
     return model
 
 
-def resnet101(checkpoint_dir,pretrained=False, num_groups=None, weight_std=False,  **kwargs):
+def resnet101(pretrained=False, num_groups=None, weight_std=False, **kwargs):
     """Constructs a ResNet-101 model.
 
     Args:
@@ -232,7 +232,7 @@ def resnet101(checkpoint_dir,pretrained=False, num_groups=None, weight_std=False
     if pretrained:
         model_dict = model.state_dict()
         if num_groups and weight_std:
-            pretrained_dict = torch.load(checkpoint_dir)
+            pretrained_dict = torch.load('deeplab_model/R-101-GN-WS.pth.tar')
             overlap_dict = {k[7:]: v for k, v in pretrained_dict.items() if k[7:] in model_dict}
             assert len(overlap_dict) == 312
         elif not num_groups and not weight_std:

@@ -13,6 +13,12 @@ import util.util as util
 from util.visualizer import Visualizer
 import util.preprocess_itw_im as preprocess
 import util.deeplab as deepl
+import numpy as np
+import os
+import cv2
+import time
+import unidecode       
+from PIL import Image
 
 opt = TestOptions().parse(save=False)
 opt.display_id = 0 # do not launch visdom
@@ -23,35 +29,35 @@ opt.no_flip = True  # no flip
 opt.in_the_wild = True # This triggers preprocessing of in the wild images in the dataloader
 opt.traverse = True # This tells the model to traverse the latent space between anchor classes
 opt.interp_step = 0.05 # this controls the number of images to interpolate between anchor classes
+# For both Python 2.7 and Python 3.x
 
 
 
 
-@runway.setup(options={'checkpoint_dir': runway.directory(description="runs folder"), 'checkpoint_dir2': runway.directory(description="pretrained weights") ,'checkpoint_dir3': runway.file(extension='.dat',description="shape predictor") })
-def setup(opts):
+@runway.command('translate', inputs={'source_imgs': runway.image(description='input image to be translated'),'amount': runway.number(min=0, max=100, default=0)}, outputs={'image': runway.image(description='input image to be translated')})
+def translate(model, inputs):
     data_loader = CreateDataLoader(opt)
     dataset = data_loader.load_data()
     visualizer = Visualizer(opt)
-    preprocess.resnet_file_path = opts['checkpoint_dir2'] + r'/R-101-GN-WS.pth.tar' 
-    preprocess.deeplab_file_path = opts['checkpoint_dir2'] + r'/deeplab_model.pth'
-    preprocess.predictor_file_path = opts['checkpoint_dir3'] 
-    preprocess.model_fname = opts['checkpoint_dir2'] + r'/deeplab_model.pth'
-    deepl.resnet101(opts['checkpoint_dir2'] + r'/R-101-GN-WS.pth.tar')
-    opt.name = opts['checkpoint_dir']
-    model = create_model(opt)
-    return model
-
-
-@runway.command('translate', inputs={'source_imgs': runway.image(description='input image to be translated'),}, outputs={'image': runway.image(description='output image containing the translated result')})
-def translate(model, inputs):
-    data = dataset.dataset.get_item_from_path(inputs['source_imgs'])
+    data_loader = CreateDataLoader(opt)
+    dataset = data_loader.load_data()
+    visualizer = Visualizer(opt)
+    opt.name = 'males_model'
+    model = create_model(opt) 
+         
+    os.makedirs('images', exist_ok=True)
+    inputs['source_imgs'].save('images/temp.jpg')
+    paths = os.path.join('images','temp.jpg')
+    
+    data = dataset.dataset.get_item_from_path(paths)
     visuals = model.inference(data)
 
-    # os.makedirs('results', exist_ok=True)
-    # out_path = os.path.join('results', os.path.splitext(img_path)[0].replace(' ', '_') + '.mp4')
-    return visualizer.make_video(visuals, out_path)
-
-
+    visual = visuals[0]
+    orig_img = visual['orig_img']
+    out_classes = len(visual) - 1
+    slide = inputs['amount']
+    next_im = visual['tex_trans_to_class_' + str(slide)]
+    return next_im
 
 
 if __name__ == '__main__':
