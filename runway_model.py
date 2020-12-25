@@ -29,8 +29,6 @@ opt.no_flip = True  # no flip
 opt.in_the_wild = True # This triggers preprocessing of in the wild images in the dataloader
 opt.traverse = True # This tells the model to traverse the latent space between anchor classes
 opt.interp_step = 0.05 # this controls the number of images to interpolate between anchor classes
-# For both Python 2.7 and Python 3.x
-
 
 
 
