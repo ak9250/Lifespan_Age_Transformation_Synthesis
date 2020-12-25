@@ -34,7 +34,7 @@ opt.interp_step = 0.05 # this controls the number of images to interpolate betwe
 
 
 
-@runway.command('translate', inputs={'source_imgs': runway.image(description='input image to be translated'),'amount': runway.number(min=0, max=100, default=0)}, outputs={'image': runway.image(description='input image to be translated')})
+@runway.command('translate', inputs={'source_imgs': runway.image(description='input image to be translated'),'amount': runway.number(min=0, max=100, default=0,description='Age'), 'gender': runway.boolean(default=True,description='On uses male model, off uses female model'),}, outputs={'image': runway.image(description='input image to be translated')})
 def translate(model, inputs):
     data_loader = CreateDataLoader(opt)
     dataset = data_loader.load_data()
@@ -42,7 +42,10 @@ def translate(model, inputs):
     data_loader = CreateDataLoader(opt)
     dataset = data_loader.load_data()
     visualizer = Visualizer(opt)
-    opt.name = 'males_model'
+    if inputs['gender']:
+        opt.name = 'males_model'
+    else:
+        opt.name = 'females_model'         
     model = create_model(opt) 
          
     os.makedirs('images', exist_ok=True)
